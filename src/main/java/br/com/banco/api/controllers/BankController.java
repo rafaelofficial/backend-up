@@ -4,9 +4,6 @@ import br.com.banco.api.dto.BankDataTransferAccountDto;
 import br.com.banco.api.entities.Transfer;
 import br.com.banco.api.services.TransferService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +20,9 @@ public class BankController {
     final private TransferService transferService;
 
     @GetMapping(value = "/all-transfers")
-    public ResponseEntity<Page<BankDataTransferAccountDto>> findAll(@PageableDefault(sort = {"id"}) Pageable pagination) {
-        Page<Transfer> list = transferService.findAll(pagination);
-        Page<BankDataTransferAccountDto> listDto = list.map(BankDataTransferAccountDto::new);
+    public ResponseEntity<List<BankDataTransferAccountDto>> findAll() {
+        List<Transfer> list = transferService.findAll();
+        List<BankDataTransferAccountDto> listDto = list.stream().map(BankDataTransferAccountDto::new).collect(Collectors.toList());
         return ResponseEntity.ok().body(listDto);
     }
 

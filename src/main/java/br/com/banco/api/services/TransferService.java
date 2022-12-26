@@ -4,8 +4,6 @@ import br.com.banco.api.entities.Transfer;
 import br.com.banco.api.exceptions.ResourceNotFoundException;
 import br.com.banco.api.repositories.TransferRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DateTimeException;
@@ -21,8 +19,8 @@ public class TransferService {
 
     final private TransferRepository repository;
 
-    public Page<Transfer> findAll(Pageable pagination) {
-        return repository.findAll(pagination).map(Transfer::new);
+    public List<Transfer> findAll() {
+        return repository.findAll().stream().map(Transfer::new).collect(Collectors.toList());
     }
 
     public Optional<Transfer> findById(Integer accountId) {
@@ -35,11 +33,11 @@ public class TransferService {
         List<Transfer> transfersByDatesList = new ArrayList<>();
         try {
             transferList.stream()
-                    .filter(dates -> dates.getData_transferencia().isBefore(endDate))
-                    .forEach(dates -> {
-                        dates.getData_transferencia().datesUntil(endDate);
-                        transfersByDatesList.add(dates);
-                    });
+              .filter(dates -> dates.getData_transferencia().isBefore(endDate))
+              .forEach(dates -> {
+                  dates.getData_transferencia().datesUntil(endDate);
+                  transfersByDatesList.add(dates);
+              });
 
             return transfersByDatesList;
         } catch (DateTimeException e) {
@@ -52,8 +50,8 @@ public class TransferService {
         List<Transfer> newTransferList;
         try {
             newTransferList = transferList.stream().filter(operator ->
-                    operator.getNome_operador_transacao() != null && operator.getNome_operador_transacao().equals(name))
-                    .collect(Collectors.toList());
+                operator.getNome_operador_transacao() != null && operator.getNome_operador_transacao().equals(name))
+              .collect(Collectors.toList());
             return newTransferList;
         } catch (Exception e) {
             throw new ResourceNotFoundException(e.getMessage());
